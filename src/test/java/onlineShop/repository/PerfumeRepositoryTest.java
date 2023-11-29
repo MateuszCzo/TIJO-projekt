@@ -1,6 +1,8 @@
 package onlineShop.repository;
 
 import onlineShop.domain.Perfume;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.*;
 
@@ -22,7 +25,8 @@ class PerfumeRepositoryTest {
 
     @Autowired
     private PerfumeRepository perfumeRepository;
-
+    @Autowired
+    private TransactionTemplate transactionTemplate;
     @Test
     public void PerfumeRepository_SaveAll_ReturnSavedPerfume() {
         // Arrange
@@ -63,14 +67,76 @@ class PerfumeRepositoryTest {
     }
 
     @Test
+    public void PerfumeRepository_GetOne_ReturnFoundPerfume() {
+        // Arrange
+        //@Sql(value = {"/sql/create-perfumes-before.sql"},executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+        Long perfumeId = 5L;
+
+        // Act
+        Perfume foundPerfume = transactionTemplate.execute(transactionStatus -> {
+            Perfume perfume = perfumeRepository.getOne(perfumeId);
+            Hibernate.initialize(perfume);
+            return perfume;
+        });
+
+        // Assert
+        assertNotNull(foundPerfume);
+        assertNotNull(foundPerfume.getId());
+        assertEquals("Deep Red", foundPerfume.getPerfumeTitle());
+        assertEquals("Hugo Boss", foundPerfume.getPerfumer());
+        assertEquals(2001, foundPerfume.getYear());
+        assertEquals("Germany", foundPerfume.getCountry());
+        assertEquals("female", foundPerfume.getPerfumeGender());
+        assertEquals("Pear, Blood orange, Clementine", foundPerfume.getFragranceTopNotes());
+        assertEquals("Freesia, Hibiscus, Ginger", foundPerfume.getFragranceMiddleNotes());
+        assertEquals("Musk, Sandalwood, Vanilla", foundPerfume.getFragranceBaseNotes());
+        assertEquals(null, foundPerfume.getDescription());
+        assertEquals("1fb6dd1b-a134-4e6f-8215-60d465d33d72.Hugo Boss Hugo Deep Red.jpg", foundPerfume.getFilename());
+        assertEquals(27, foundPerfume.getPrice());
+        assertEquals("90", foundPerfume.getVolume());
+        assertEquals("Eau de parfum", foundPerfume.getType());
+    }
+
+    @Test
+    public void PerfumeRepository_FindById_ReturnFoundPerfume() {
+        // Arrange
+        //@Sql(value = {"/sql/create-perfumes-before.sql"},executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+        Long perfumeId = 5L;
+
+        // Act
+        Optional<Perfume> foundPerfumeOptional = perfumeRepository.findById(perfumeId);
+
+        // Assert
+        assertTrue(foundPerfumeOptional.isPresent());
+
+        Perfume foundPerfume = foundPerfumeOptional.get();
+
+        assertNotNull(foundPerfume);
+        assertNotNull(foundPerfume.getId());
+        assertEquals("Deep Red", foundPerfume.getPerfumeTitle());
+        assertEquals("Hugo Boss", foundPerfume.getPerfumer());
+        assertEquals(2001, foundPerfume.getYear());
+        assertEquals("Germany", foundPerfume.getCountry());
+        assertEquals("female", foundPerfume.getPerfumeGender());
+        assertEquals("Pear, Blood orange, Clementine", foundPerfume.getFragranceTopNotes());
+        assertEquals("Freesia, Hibiscus, Ginger", foundPerfume.getFragranceMiddleNotes());
+        assertEquals("Musk, Sandalwood, Vanilla", foundPerfume.getFragranceBaseNotes());
+        assertEquals(null, foundPerfume.getDescription());
+        assertEquals("1fb6dd1b-a134-4e6f-8215-60d465d33d72.Hugo Boss Hugo Deep Red.jpg", foundPerfume.getFilename());
+        assertEquals(27, foundPerfume.getPrice());
+        assertEquals("90", foundPerfume.getVolume());
+        assertEquals("Eau de parfum", foundPerfume.getType());
+    }
+
+    @Test
     public void PerfumeRepository_FindByIdIn_ReturnFoundPerfumes() {
         // Arrange
         //@Sql(value = {"/sql/create-perfumes-before.sql"},executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         List<Long> perfumeIds = new ArrayList<>();
-        perfumeIds.add(Long.valueOf(5));
-        perfumeIds.add(Long.valueOf(30));
-        perfumeIds.add(Long.valueOf(35));
-        perfumeIds.add(Long.valueOf(40));
+        perfumeIds.add(5L);
+        perfumeIds.add(30L);
+        perfumeIds.add(35L);
+        perfumeIds.add(40L);
 
         // Act
         List<Perfume> foundPerfumes = perfumeRepository.findByIdIn(perfumeIds);
