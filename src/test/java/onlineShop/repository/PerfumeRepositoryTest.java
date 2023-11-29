@@ -2,7 +2,6 @@ package onlineShop.repository;
 
 import onlineShop.domain.Perfume;
 import org.hibernate.Hibernate;
-import org.hibernate.Session;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,7 +27,7 @@ class PerfumeRepositoryTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
     @Test
-    public void PerfumeRepository_SaveAll_ReturnSavedPerfume() {
+    public void PerfumeRepository_Save_ReturnSavedPerfume() {
         // Arrange
         Perfume perfume = new Perfume();
         perfume.setPerfumeTitle("Chanel No. 5");
