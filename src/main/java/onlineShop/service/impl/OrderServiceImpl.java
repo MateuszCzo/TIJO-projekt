@@ -55,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = modelMapper.map(orderRequest, Order.class);
         order.setUser(user);
         order.getPerfumes().addAll(user.getPerfumeList());
-        orderRepository.save(order);
+        order = orderRepository.save(order);
         user.getPerfumeList().clear();
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("order", order);
