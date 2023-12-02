@@ -8,3 +8,5 @@ insert into users(id, email, first_name, last_name, city, address, phone_number,
 
 insert into user_role (user_id, roles) values (1, 'ADMIN');
 insert into user_role (user_id, roles) values (2, 'USER');
+
+insert into users_perfume_list (user_id, perfume_list_id) values (2, 1);
